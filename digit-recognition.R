@@ -22,15 +22,23 @@ test_data=test[, 1:64]
 train_data=train[, 1:64]
 #train_labels=train[, 65]
 train_labels=as.factor(train$V65)
-test_labels=test[, 65]
+test_labels=as.factor(test$V65)
 
-kknn_model = kknn(formula=train_labels~., test=test, train=train, k=3, kernel="rectangular")
-kknn_model$prob
-fit <- fitted(kknn_model)
-conf_matrix = table(test_labels, fit)
-conf_matrix
-#confusionmatrix_kknn = table(test_labels,kknn_model[["fitted.values"]]) 
-#confusionmatrix_kknn
+kknn_model_train = kknn(formula=train_labels~., test=test, train=train, k=30, kernel="rectangular")
+kknn_model_test = kknn(formula=test_labels~., test=test, train=test, k=30, kernel="rectangular")
+
+kknn_model_train$prob
+kknn_model_test$prob
+
+fit_train <- fitted(kknn_model_train)
+conf_matrix_train = table(test_labels, fit_train)
+
+fit_test <- fitted(kknn_model_test)
+conf_matrix_test = table(test_labels, fit_test)
+
+conf_matrix_train
+conf_matrix_test
+
 
 
 #missclass=function(X,X1){n=length(X)return(1-sum(diag(table(X,X1)))/n)}
