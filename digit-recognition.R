@@ -1,5 +1,4 @@
 library(kknn)
-library(caret)
 
 data = read.csv('optdigits.csv', header=FALSE)
 
@@ -21,8 +20,17 @@ test=data[id3,]
 #Remove the label element 65 on each row
 test_data=test[, 1:64]
 train_data=train[, 1:64]
-train_labels=train[, 65]
-kkn_model = kknn(formula = formula(train),train, test, k=30,  kernel="rectangular")
+#train_labels=train[, 65]
+train_labels=as.factor(train$V65)
+test_labels=test[, 65]
 
-confusionMatrix(kkn_model)["table"]
+kknn_model = kknn(formula=train_labels~., test=test, train=train, k=3, kernel="rectangular")
+kknn_model$prob
+fit <- fitted(kknn_model)
+conf_matrix = table(test_labels, fit)
+conf_matrix
+#confusionmatrix_kknn = table(test_labels,kknn_model[["fitted.values"]]) 
+#confusionmatrix_kknn
 
+
+#missclass=function(X,X1){n=length(X)return(1-sum(diag(table(X,X1)))/n)}
