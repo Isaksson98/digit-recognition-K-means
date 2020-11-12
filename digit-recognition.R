@@ -27,18 +27,38 @@ test_labels=as.factor(test$V65)
 kknn_model_train = kknn(formula=train_labels~., test=test, train=train, k=30, kernel="rectangular")
 kknn_model_test = kknn(formula=test_labels~., test=test, train=test, k=30, kernel="rectangular")
 
-kknn_model_train$prob
-kknn_model_test$prob
-
 fit_train <- fitted(kknn_model_train)
-conf_matrix_train = table(test_labels, fit_train)
+conf_matrix_train = table(fit_train, test_labels)
 
 fit_test <- fitted(kknn_model_test)
-conf_matrix_test = table(test_labels, fit_test)
+conf_matrix_test = table(fit_test, test_labels)
 
 conf_matrix_train
 conf_matrix_test
 
 
 
-#missclass=function(X,X1){n=length(X)return(1-sum(diag(table(X,X1)))/n)}
+missclass=function(X,X1){
+  n=length(X)
+  return(1-sum(diag(table(X,X1)))/n)
+}
+
+#missclass(conf_matrix_train, conf_matrix_test)
+missclass_rate_train = 1-sum(diag(conf_matrix_train)/sum(conf_matrix_train))
+missclass_rate_test = 1-sum(diag(conf_matrix_test)/sum(conf_matrix_test))
+
+
+###STEP 3###
+
+list_of_8 = kknn_model_train$prob[,9]
+
+num = sort(list_of_8, decreasing = FALSE)
+
+num1 = 14
+imge=train_data[num1,]
+d <- matrix(imge, nrow = 8, byrow = TRUE)
+y = matrix(as.numeric(d), nrow = 8)
+
+heatmap(y, Colv=NA, Rowv=NA)
+imge2=train[num1,]
+imge2$V65
