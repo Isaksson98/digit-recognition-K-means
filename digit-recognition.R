@@ -1,4 +1,5 @@
 library(kknn)
+library(caret)
 
 data = read.csv('optdigits.csv', header=FALSE)
 
@@ -35,7 +36,8 @@ conf_matrix_test = table(fit_test, test_labels)
 
 conf_matrix_train
 conf_matrix_test
-
+cfm <- confusionMatrix(fit_train, test_labels)
+cfm
 
 
 missclass=function(X,X1){
@@ -43,15 +45,16 @@ missclass=function(X,X1){
   return(1-sum(diag(table(X,X1)))/n)
 }
 
-#missclass(conf_matrix_train, conf_matrix_test)
+missclass(fit_train, test_labels)
 missclass_rate_train = 1-sum(diag(conf_matrix_train)/sum(conf_matrix_train))
 missclass_rate_test = 1-sum(diag(conf_matrix_test)/sum(conf_matrix_test))
-
-
+missclass_rate_train
+num4 = mean(fit_train != test_labels)
+num4
 ###STEP 3###
 
-list_of_8 = kknn_model_train$prob[,9]
-
+list_of_8 = kknn_model_train$prob
+list_of_8
 num = sort(list_of_8, decreasing = FALSE)
 
 num1 = 14
@@ -62,3 +65,36 @@ y = matrix(as.numeric(d), nrow = 8)
 heatmap(y, Colv=NA, Rowv=NA)
 imge2=train[num1,]
 imge2$V65
+
+###STEP 4###
+m <- vector("integer", 30)
+s <- vector("integer", 30)
+
+for(k in 1:30){
+  kknn_model_loop_m = kknn(formula=train_labels~., test=test, train=train, k=k, kernel="rectangular")
+  fit_train_loop_m <- fitted(kknn_model_loop_m)
+  m[k] <- missclass(fit_train_loop_m, test_labels)
+
+  kknn_model_loop_s = kknn(formula=test_labels~., test=test, train=test, k=k, kernel="rectangular")
+  fit_train_loop_s <- fitted(kknn_model_loop_s)
+  s[k] <- missclass(fit_train_loop_s, test_labels)
+}
+
+plot( m, type='l', col='orange', main='Errors on test data',
+     xlab='K', ylab='Missclass_err')
+lines( s, col='blue')
+
+
+###STEP 5###
+
+
+
+
+
+
+
+
+
+
+
+
